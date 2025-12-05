@@ -41,7 +41,7 @@ export default function Layout() {
         <div className="flex items-center justify-between h-16 px-6 bg-primary-700">
           <Link to="/" className="flex items-center space-x-2">
             <Calendar className="h-8 w-8 text-white" />
-            <span className="text-xl font-bold text-white">TourLogix</span>
+            <span className="text-xl font-bold text-white">Soft Shock</span>
           </Link>
           <button
             className="lg:hidden text-white"
