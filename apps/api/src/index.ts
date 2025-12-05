@@ -78,34 +78,15 @@ app.get('/api/debug', async (req, res) => {
 
 // Serve static frontend in production
 if (process.env.NODE_ENV === 'production') {
-  // Try multiple possible paths for the frontend dist
-  const possiblePaths = [
-    path.join(__dirname, '../../web/dist'),
-    path.join(__dirname, '../../../apps/web/dist'),
-    path.resolve(process.cwd(), '../web/dist'),
-    path.resolve(process.cwd(), 'apps/web/dist'),
-    '/opt/render/project/src/apps/web/dist'
-  ];
-
-  let frontendPath = possiblePaths[0];
-  for (const p of possiblePaths) {
-    try {
-      const fs = await import('fs');
-      if (fs.existsSync(path.join(p, 'index.html'))) {
-        frontendPath = p;
-        console.log(`Found frontend at: ${p}`);
-        break;
-      }
-    } catch {}
-  }
-
+  // Frontend is copied to ./public during build
+  const frontendPath = path.join(__dirname, '../public');
   console.log(`Serving frontend from: ${frontendPath}`);
   app.use(express.static(frontendPath));
 
   // Handle SPA routing - serve index.html for all non-API routes
   app.get('*', (req, res) => {
     if (!req.path.startsWith('/api')) {
-      res.sendFile(path.join(frontendPath, 'index.html'));
+      res.sendFile(path.join(__dirname, '../public', 'index.html'));
     }
   });
 }
