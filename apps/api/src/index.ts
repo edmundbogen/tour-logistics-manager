@@ -51,6 +51,31 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Debug endpoint to help diagnose path issues
+app.get('/api/debug', async (req, res) => {
+  const fs = await import('fs');
+  const possiblePaths = [
+    path.join(__dirname, '../../web/dist'),
+    path.join(__dirname, '../../../apps/web/dist'),
+    path.resolve(process.cwd(), '../web/dist'),
+    path.resolve(process.cwd(), 'apps/web/dist'),
+    '/opt/render/project/src/apps/web/dist'
+  ];
+
+  const results = possiblePaths.map(p => ({
+    path: p,
+    exists: fs.existsSync(p),
+    hasIndex: fs.existsSync(path.join(p, 'index.html'))
+  }));
+
+  res.json({
+    __dirname,
+    cwd: process.cwd(),
+    possiblePaths: results,
+    env: process.env.NODE_ENV
+  });
+});
+
 // Serve static frontend in production
 if (process.env.NODE_ENV === 'production') {
   // Try multiple possible paths for the frontend dist
