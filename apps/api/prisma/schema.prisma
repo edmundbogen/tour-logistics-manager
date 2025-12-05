@@ -1,0 +1,257 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Tour {
+  id                    String   @id @default(uuid())
+  name                  String
+  artistName            String   @map("artist_name")
+  startDate             DateTime @map("start_date")
+  endDate               DateTime @map("end_date")
+  tourManagerName       String?  @map("tour_manager_name")
+  tourManagerPhone      String?  @map("tour_manager_phone")
+  tourManagerEmail      String?  @map("tour_manager_email")
+  productionContactName String?  @map("production_contact_name")
+  productionContactPhone String? @map("production_contact_phone")
+  agentName             String?  @map("agent_name")
+  agentPhone            String?  @map("agent_phone")
+  managementName        String?  @map("management_name")
+  managementPhone       String?  @map("management_phone")
+  notes                 String?
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  shows        Show[]
+  teamMembers  TeamMember[]
+  activityLogs ActivityLog[]
+
+  @@map("tours")
+}
+
+model Show {
+  id                     String   @id @default(uuid())
+  tourId                 String   @map("tour_id")
+  showNumber             Int?     @map("show_number")
+  city                   String
+  stateCountry           String?  @map("state_country")
+  venueName              String   @map("venue_name")
+  venueAddress           String?  @map("venue_address")
+  showDate               DateTime @map("show_date")
+  onStageTime            String?  @map("on_stage_time")
+  setLengthMinutes       Int?     @map("set_length_minutes")
+  doorsTime              String?  @map("doors_time")
+  curfewTime             String?  @map("curfew_time")
+  requiredOnSiteTime     String   @map("required_on_site_time")
+  soundcheckTime         String?  @map("soundcheck_time")
+  soundcheckDurationMinutes Int?  @map("soundcheck_duration_minutes")
+  loadInTime             String?  @map("load_in_time")
+
+  // Venue contacts
+  venueContactName       String?  @map("venue_contact_name")
+  venueContactEmail      String?  @map("venue_contact_email")
+  venueContactPhone      String?  @map("venue_contact_phone")
+  dayOfContactName       String?  @map("day_of_contact_name")
+  dayOfContactPhone      String?  @map("day_of_contact_phone")
+  productionContactName  String?  @map("production_contact_name")
+  productionContactPhone String?  @map("production_contact_phone")
+
+  // Venue details
+  parkingInstructions    String?  @map("parking_instructions")
+  credentialsProcess     String?  @map("credentials_process")
+  greenRoomInfo          String?  @map("green_room_info")
+  cateringInfo           String?  @map("catering_info")
+  wifiInfo               String?  @map("wifi_info")
+  venueCapacity          Int?     @map("venue_capacity")
+  ageRestriction         String?  @map("age_restriction")
+
+  // Financial
+  guarantee              Float?
+  doorSplit              String?  @map("door_split")
+  merchSplit             String?  @map("merch_split")
+  settlementTime         String?  @map("settlement_time")
+  depositReceived        Boolean  @default(false) @map("deposit_received")
+  depositAmount          Float?   @map("deposit_amount")
+
+  // Status
+  overallStatus          String   @default("Not Started") @map("overall_status")
+  venueStatus            String   @default("Pending") @map("venue_status")
+  riskLevel              String   @default("Green") @map("risk_level")
+  riskNotes              String?  @map("risk_notes")
+  backupPlan             String?  @map("backup_plan")
+  specialNotes           String?  @map("special_notes")
+  postShowNotes          String?  @map("post_show_notes")
+
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  tour             Tour              @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  flights          Flight[]
+  hotels           Hotel[]
+  groundTransports GroundTransport[]
+  checklists       ChecklistInstance[]
+  activityLogs     ActivityLog[]
+
+  @@map("shows")
+}
+
+model Flight {
+  id                  String   @id @default(uuid())
+  showId              String   @map("show_id")
+  originAirport       String   @map("origin_airport")
+  destinationAirport  String   @map("destination_airport")
+
+  optionNumber        Int      @map("option_number")
+  airline             String?
+  flightNumber        String?  @map("flight_number")
+  departureDatetime   DateTime? @map("departure_datetime")
+  arrivalDatetime     DateTime? @map("arrival_datetime")
+  isPrimary           Boolean  @default(false) @map("is_primary")
+  isBackup            Boolean  @default(false) @map("is_backup")
+
+  confirmationNumber  String?  @map("confirmation_number")
+  airlinePhone        String?  @map("airline_phone")
+  price               Float?
+
+  status              String   @default("Not Booked")
+  notes               String?
+
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  show                Show     @relation(fields: [showId], references: [id], onDelete: Cascade)
+
+  @@map("flights")
+}
+
+model Hotel {
+  id                    String   @id @default(uuid())
+  showId                String   @map("show_id")
+  hotelName             String   @map("hotel_name")
+  hotelAddress          String?  @map("hotel_address")
+  hotelPhone            String?  @map("hotel_phone")
+  confirmationNumber    String?  @map("confirmation_number")
+  checkInDate           DateTime? @map("check_in_date")
+  checkInTime           String?  @map("check_in_time")
+  checkOutDate          DateTime? @map("check_out_date")
+  checkOutTime          String?  @map("check_out_time")
+  roomType              String?  @map("room_type")
+  distanceToVenueMinutes Int?    @map("distance_to_venue_minutes")
+  distanceToAirportMinutes Int?  @map("distance_to_airport_minutes")
+  pricePerNight         Float?   @map("price_per_night")
+  earlyCheckinAvailable Boolean? @map("early_checkin_available")
+  lateCheckoutAvailable Boolean? @map("late_checkout_available")
+  notes                 String?
+  status                String   @default("Not Booked")
+
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  show                  Show     @relation(fields: [showId], references: [id], onDelete: Cascade)
+
+  @@map("hotels")
+}
+
+model GroundTransport {
+  id                    String   @id @default(uuid())
+  showId                String   @map("show_id")
+  transportType         String?  @map("transport_type")
+  driverName            String?  @map("driver_name")
+  driverPhone           String?  @map("driver_phone")
+  driverCompany         String?  @map("driver_company")
+  confirmationNumber    String?  @map("confirmation_number")
+  pickupLocation        String?  @map("pickup_location")
+  pickupDatetime        DateTime? @map("pickup_datetime")
+  vehicleType           String?  @map("vehicle_type")
+  airportToVenueMinutes Int?     @map("airport_to_venue_minutes")
+  price                 Float?
+  notes                 String?
+  status                String   @default("Not Booked")
+
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  show                  Show     @relation(fields: [showId], references: [id], onDelete: Cascade)
+
+  @@map("ground_transport")
+}
+
+model TeamMember {
+  id                    String   @id @default(uuid())
+  tourId                String   @map("tour_id")
+  name                  String
+  role                  String?
+  email                 String?
+  phone                 String?
+  emergencyContactName  String?  @map("emergency_contact_name")
+  emergencyContactPhone String?  @map("emergency_contact_phone")
+  notes                 String?
+
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  tour                  Tour     @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@map("team_members")
+}
+
+model ChecklistTemplate {
+  id          String   @id @default(uuid())
+  name        String
+  category    String
+  items       String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  instances   ChecklistInstance[]
+
+  @@map("checklist_templates")
+}
+
+model ChecklistInstance {
+  id              String   @id @default(uuid())
+  showId          String   @map("show_id")
+  templateId      String   @map("template_id")
+  items           String
+  completedCount  Int      @default(0) @map("completed_count")
+  totalCount      Int      @map("total_count")
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  show            Show              @relation(fields: [showId], references: [id], onDelete: Cascade)
+  template        ChecklistTemplate @relation(fields: [templateId], references: [id])
+
+  @@map("checklist_instances")
+}
+
+model ActivityLog {
+  id          String   @id @default(uuid())
+  tourId      String?  @map("tour_id")
+  showId      String?  @map("show_id")
+  actionType  String   @map("action_type")
+  description String
+  createdBy   String?  @map("created_by")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  tour        Tour?    @relation(fields: [tourId], references: [id])
+  show        Show?    @relation(fields: [showId], references: [id])
+
+  @@map("activity_log")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String   @map("password_hash")
+  name          String
+  role          String   @default("user")
+
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
