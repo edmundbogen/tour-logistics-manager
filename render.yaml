@@ -13,7 +13,6 @@ services:
       npx prisma generate
     startCommand: |
       cd /opt/render/project/src/apps/api
-      ls -la prisma/
       npx prisma db push --schema=/opt/render/project/src/apps/api/prisma/schema.prisma
       npx tsx prisma/seed.ts 2>/dev/null || true
       echo "Starting server..."
@@ -23,12 +22,12 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        value: file:./prisma/prod.db
+        value: file:/data/prod.db
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
         value: "*"
     disk:
       name: sqlite-data
-      mountPath: /opt/render/project/src/apps/api/prisma
+      mountPath: /data
       sizeGB: 1
