@@ -12,11 +12,10 @@ services:
       npm install
       npx prisma generate
     startCommand: |
-      cd apps/api
-      npx prisma db push
+      cd /opt/render/project/src/apps/api
+      npx prisma db push --schema=./prisma/schema.prisma
       npx tsx prisma/seed.ts 2>/dev/null || true
       echo "Starting server..."
-      echo "Checking for frontend at /opt/render/project/src/apps/web/dist"
       ls -la /opt/render/project/src/apps/web/dist/ || echo "Frontend dist not found!"
       npx tsx src/index.ts
     envVars:
