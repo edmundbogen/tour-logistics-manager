@@ -2,8 +2,23 @@ services:
   - type: web
     name: tour-logistics-manager
     runtime: node
-    buildCommand: npm install && cd apps/web && npm install && npm run build && cd ../api && npm install && npx prisma generate
-    startCommand: cd apps/api && npx prisma db push && (npx tsx prisma/seed.ts 2>/dev/null || true) && npx tsx src/index.ts
+    buildCommand: |
+      npm install
+      cd apps/web
+      npm install
+      npm run build
+      ls -la dist/
+      cd ../api
+      npm install
+      npx prisma generate
+    startCommand: |
+      cd apps/api
+      npx prisma db push
+      npx tsx prisma/seed.ts 2>/dev/null || true
+      echo "Starting server..."
+      echo "Checking for frontend at /opt/render/project/src/apps/web/dist"
+      ls -la /opt/render/project/src/apps/web/dist/ || echo "Frontend dist not found!"
+      npx tsx src/index.ts
     envVars:
       - key: NODE_ENV
         value: production
